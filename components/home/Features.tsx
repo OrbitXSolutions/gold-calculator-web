@@ -1,4 +1,6 @@
-import { Shield, TrendingUp, CheckCircle2, Zap } from 'lucide-react'
+ "use client"
+ import { Shield, TrendingUp, CheckCircle2, Zap } from 'lucide-react'
+ import { motion } from 'framer-motion'
 
 function FeatureCard({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle: string }) {
   return (
@@ -18,13 +20,13 @@ export default function Features() {
   return (
     <section className="section-spacing">
       <div className="container-max">
-        <h2 className="text-center text-neutral text-2xl font-semibold">Why Use Our Calculator?</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+        <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="text-center text-neutral text-2xl font-semibold">Why Use Our Calculator?</motion.h2>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }} className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
           <FeatureCard icon={Shield} title="Avoid overpaying for gold" subtitle="Know exactly what you're paying for" />
           <FeatureCard icon={TrendingUp} title="Know the real market rate instantly" subtitle="Up-to-date prices for all karats" />
           <FeatureCard icon={CheckCircle2} title="Understand making charges clearly" subtitle="See shop profit breakdown per gram" />
           <FeatureCard icon={Zap} title="Make smarter buying decisions" subtitle="Get instant analysis and recommendations" />
-        </div>
+        </motion.div>
       </div>
     </section>
   )

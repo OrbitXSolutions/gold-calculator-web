@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Menu, Globe } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -13,7 +14,7 @@ export default function Navbar() {
         <nav className="navbar container-max" style={{ height: 'var(--navbar-height)' }}>
           <div className="flex-1">
             <Link href="/" className="text-xl font-semibold text-neutral flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">💰</span>
+              <Image src="/icon.svg" alt="GoldCheck" width={32} height={32} className="rounded-lg" />
               GoldCheck
             </Link>
           </div>
@@ -22,8 +23,8 @@ export default function Navbar() {
               <li><Link href="/">Home</Link></li>
               <li><Link href="#">Calculator</Link></li>
               <li><Link href="#">Blog</Link></li>
-              <li><Link href="#">About Us</Link></li>
-              <li><Link href="#">Contact Us</Link></li>
+              <li><Link href="/about-us">About Us</Link></li>
+              <li><Link href="/contact-us">Contact Us</Link></li>
             </ul>
             <div className="dropdown dropdown-end ml-2">
               <label tabIndex={0} className="btn btn-sm bg-base-100 border border-neutral/10 text-neutral/80">
@@ -49,8 +50,8 @@ export default function Navbar() {
           <li><Link href="/" onClick={() => setOpen(false)}>Home</Link></li>
           <li><Link href="#" onClick={() => setOpen(false)}>Calculator</Link></li>
           <li><Link href="#" onClick={() => setOpen(false)}>Blog</Link></li>
-          <li><Link href="#" onClick={() => setOpen(false)}>About Us</Link></li>
-          <li><Link href="#" onClick={() => setOpen(false)}>Contact Us</Link></li>
+          <li><Link href="/about-us" onClick={() => setOpen(false)}>About Us</Link></li>
+          <li><Link href="/contact-us" onClick={() => setOpen(false)}>Contact Us</Link></li>
           <div className="divider"></div>
           <div className="dropdown">
             <label tabIndex={0} className="btn btn-sm bg-base-100 border border-neutral/10 text-neutral/80 w-full justify-start">
