@@ -1,6 +1,9 @@
 "use client"
 import { Mail, MessageSquare, Clock } from 'lucide-react'
 import { motion } from 'framer-motion'
+const MotionDiv: any = motion.div
+const MotionP: any = motion.p
+const MotionH1: any = motion.h1
 
 function ContactCard({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
   return (
@@ -21,24 +24,24 @@ export default function ContactUsPage() {
   return (
     <div className="section-spacing">
       <div className="container-max">
-        <motion.h1 initial={fade.initial} animate={fade.animate} transition={{ duration: 0.4 }} className="text-neutral text-xl font-semibold">
+        <MotionH1 initial={fade.initial} animate={fade.animate} transition={{ duration: 0.4 }} className="text-neutral text-xl font-semibold">
           Contact Us
-        </motion.h1>
-        <motion.p initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.05 }} className="text-neutral/80 mt-2">
+        </MotionH1>
+        <MotionP initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.05 }} className="text-neutral/80 mt-2">
           Have a question, suggestion, or partnership request? We'd love to hear from you.
-        </motion.p>
+        </MotionP>
 
-        <motion.div initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.1 }} className="mt-4 space-y-4">
+        <MotionDiv initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.1 }} className="mt-4 space-y-4">
           <ContactCard icon={Mail} label="Email:" value="support@goldcheck.com" />
           <ContactCard icon={MessageSquare} label="WhatsApp:" value="+971 5X XXX XXXX" />
           <ContactCard icon={Clock} label="Business Hours:" value="9:00am – 6:00pm (GST)" />
-        </motion.div>
+        </MotionDiv>
 
-        <motion.div initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.15 }} className="mt-6">
+        <MotionDiv initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.15 }} className="mt-6">
           <div className="bg-secondary rounded-xl border border-primary/20 p-4 text-neutral/80">
             We typically respond within 24 hours during business days.
           </div>
-        </motion.div>
+        </MotionDiv>
       </div>
     </div>
   )

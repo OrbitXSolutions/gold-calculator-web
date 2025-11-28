@@ -1,17 +1,18 @@
 "use client"
 import { Target, TrendingUp, GraduationCap, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
+const MotionDiv: any = motion.div
 
 export default function AboutUsPage() {
   const fade = { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } }
   return (
     <div className="section-spacing">
       <div className="container-max">
-        <motion.h1 initial={fade.initial} animate={fade.animate} transition={{ duration: 0.4 }} className="text-neutral text-xl font-semibold">
-          About Us
-        </motion.h1>
+        <MotionDiv initial={fade.initial} animate={fade.animate} transition={{ duration: 0.4 }}>
+          <h1 className="text-neutral text-xl font-semibold">About Us</h1>
+        </MotionDiv>
 
-        <motion.div initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.05 }} className="bg-base-100 rounded-xl shadow-card p-6 mt-4">
+        <MotionDiv initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.05 }} className="bg-base-100 rounded-xl shadow-card p-6 mt-4">
           <p className="text-neutral/80 leading-relaxed">
             We created this platform to help buyers in the UAE and GCC understand gold pricing clearly and transparently. Gold is a valuable purchase, and many buyers pay more than necessary because they don't know the actual market price.
           </p>
@@ -26,9 +27,9 @@ export default function AboutUsPage() {
             </ul>
             <p className="text-neutral/60 italic mt-4">We are continuously adding new features such as alerts, charts, and educational articles.</p>
           </div>
-        </motion.div>
+        </MotionDiv>
 
-        <motion.div initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.1 }} className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+        <MotionDiv initial={fade.initial} animate={fade.animate} transition={{ duration: 0.5, delay: 0.1 }} className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
           <div className="card-feature">
             <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
               <Target className="h-6 w-6 text-primary" />
@@ -65,7 +66,7 @@ export default function AboutUsPage() {
               <p className="text-neutral/70 text-sm mt-1">Building trust with UAE gold buyers</p>
             </div>
           </div>
-        </motion.div>
+        </MotionDiv>
       </div>
     </div>
   )
