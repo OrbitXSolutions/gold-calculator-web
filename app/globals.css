@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navbar-height: 72px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  @apply bg-secondary text-neutral/90 font-sans;
+  background-image: theme('backgroundImage.warm-gradient');
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+}
+
+.container-max {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.hero-title {
+  @apply text-center text-2xl sm:text-3xl lg:text-4xl font-semibold text-neutral;
+}
+.hero-subtitle {
+  @apply text-center text-neutral/80 mt-4 max-w-3xl mx-auto leading-relaxed;
+}
+
+.gold-btn {
+  background-image: theme('backgroundImage.gold-button');
+  @apply text-white font-semibold rounded-lg shadow-md px-6 py-3 hover:opacity-95 transition;
+}
+
+.card-feature {
+  @apply bg-base-100 rounded-xl shadow-card p-5 flex items-start gap-4;
+}
+
+.footer-dark {
+  background-image: theme('backgroundImage.cta-gradient');
+}
+
+.section-spacing {
+  @apply py-12 sm:py-16 lg:py-20;
+}
