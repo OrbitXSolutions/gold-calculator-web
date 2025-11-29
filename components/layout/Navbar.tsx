@@ -22,7 +22,7 @@ export default function Navbar() {
             <ul className="menu menu-horizontal px-1 text-neutral/90">
               <li><Link href="/">Home</Link></li>
               <li><Link href="#">Calculator</Link></li>
-              <li><Link href="#">Blog</Link></li>
+              <li><Link href="/blog">Blog</Link></li>
               <li><Link href="/about-us">About Us</Link></li>
               <li><Link href="/contact-us">Contact Us</Link></li>
             </ul>
@@ -49,7 +49,7 @@ export default function Navbar() {
         <ul className="menu p-4 w-64 min-h-full bg-base-100 text-neutral">
           <li><Link href="/" onClick={() => setOpen(false)}>Home</Link></li>
           <li><Link href="#" onClick={() => setOpen(false)}>Calculator</Link></li>
-          <li><Link href="#" onClick={() => setOpen(false)}>Blog</Link></li>
+          <li><Link href="/blog" onClick={() => setOpen(false)}>Blog</Link></li>
           <li><Link href="/about-us" onClick={() => setOpen(false)}>About Us</Link></li>
           <li><Link href="/contact-us" onClick={() => setOpen(false)}>Contact Us</Link></li>
           <div className="divider"></div>
