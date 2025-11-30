@@ -26,7 +26,12 @@ export default function AdminLoginPage() {
     try {
       const res = await loginWithPassword(identifier.trim(), password);
       localStorage.setItem("auth_token", res.accessToken);
-      localStorage.setItem("auth_user", JSON.stringify(res));
+      localStorage.setItem("auth_user", JSON.stringify({
+        userId: res.userId,
+        userName: res.userName,
+        displayName: res.displayName,
+        expiresUtc: res.expiresUtc,
+      }));
       router.replace("/admin/blogs");
     } catch (err: any) {
       setError(err.message || "Login failed");

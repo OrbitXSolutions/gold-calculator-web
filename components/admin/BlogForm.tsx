@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { RichMarkdownEditor } from "./RichMarkdownEditor";
 import { BlogCreateDto, BlogDto, BlogUpdateDto } from "../../types/blog";
 import { createBlog, updateBlog, publishBlog, unpublishBlog } from "../../lib/api";
 
@@ -77,8 +78,8 @@ export function BlogForm({ mode, blog, onSaved }: BlogFormProps) {
         <textarea value={summary} onChange={e => setSummary(e.target.value)} rows={3} className="w-full rounded border px-3 py-2 text-sm" />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Content (Markdown)</label>
-        <textarea value={content} onChange={e => setContent(e.target.value)} rows={12} required className="w-full rounded border px-3 py-2 text-sm font-mono" />
+        <label className="block text-sm font-medium mb-2">Content (Markdown)</label>
+        <RichMarkdownEditor value={content} onChange={setContent} />
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         <div>

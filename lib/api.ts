@@ -144,6 +144,43 @@ export async function deleteComment(commentId: string, hard = false): Promise<vo
   await handleResponse<void>(res);
 }
 
+// List all comments (optionally filtered by blogId) paginated
+export async function listComments(query: { page?: number; pageSize?: number; blogId?: string } = {}): Promise<PagedResult<CommentDto>> {
+  const params: Record<string, any> = {
+    page: query.page ?? 1,
+    pageSize: query.pageSize ?? 20,
+  };
+  if (query.blogId) params.blogId = query.blogId;
+  const url = buildUrl("comments", params);
+  try {
+    const res = await fetch(url, { headers: { ...authHeaders() }, next: { revalidate: 10 } });
+    const data = await handleResponse<PagedResult<CommentDto>>(res);
+    // Normalize/enhance if backend supplies basic shape
+    if ((data as any).items && Array.isArray((data as any).items)) {
+      return enhancePagedResult(data);
+    }
+    // Fallback: assume array of comments returned
+    if (Array.isArray(data)) {
+      const arr = data as unknown as CommentDto[];
+      return enhancePagedResult({ page: params.page, pageSize: params.pageSize, totalCount: arr.length, items: arr });
+    }
+    return enhancePagedResult({ page: params.page, pageSize: params.pageSize, totalCount: 0, items: [] });
+  } catch {
+    return enhancePagedResult({ page: params.page, pageSize: params.pageSize, totalCount: 0, items: [] });
+  }
+}
+
+// Update comment content (generic moderation/edit)
+export async function updateComment(commentId: string, content: string): Promise<CommentDto> {
+  const url = buildUrl(`comments/${commentId}`);
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify({ content }),
+  });
+  return handleResponse<CommentDto>(res);
+}
+
 // --- Categories ---
 export async function getCategories(): Promise<CategoryDto[]> {
   // Try lowercase then PascalCase to handle backend casing differences.

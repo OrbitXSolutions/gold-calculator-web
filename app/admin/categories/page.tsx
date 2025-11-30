@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
-import { getCategories } from "../../../lib/api";
+import { getCategories, deleteCategory } from "../../../lib/api";
 import { CategoryForm } from "../../../components/admin/CategoryForm";
 import { CategoryDto } from "../../../types/blog";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = React.useState<CategoryDto[]>([]);
+  const [editing, setEditing] = React.useState<CategoryDto | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [lastFetchedAt, setLastFetchedAt] = React.useState<Date | null>(null);
@@ -34,7 +35,21 @@ export default function AdminCategoriesPage() {
           {loading ? "Loading..." : "Refresh"}
         </button>
       </div>
-      <CategoryForm />
+      <div className="max-w-sm">
+        <CategoryForm
+          category={editing}
+          onSaved={(c) => {
+            setEditing(null);
+            // merge or reload
+            setCategories(prev => {
+              const exists = prev.some(p => p.id === c.id);
+              if (exists) return prev.map(p => p.id === c.id ? c : p);
+              return [c, ...prev];
+            });
+          }}
+          onCancelEdit={() => setEditing(null)}
+        />
+      </div>
       {error && <div className="rounded border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">{error}</div>}
       <div className="rounded border bg-white overflow-hidden">
         <table className="w-full text-sm">
@@ -42,7 +57,7 @@ export default function AdminCategoriesPage() {
             <tr className="text-left">
               <th className="p-2 border">Name</th>
               <th className="p-2 border">Slug</th>
-              <th className="p-2 border">Parent</th>
+              <th className="p-2 border">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -50,7 +65,27 @@ export default function AdminCategoriesPage() {
               <tr key={c.id} className="border-t">
                 <td className="p-2 border font-medium">{c.name}</td>
                 <td className="p-2 border text-xs text-gray-600">{c.slug}</td>
-                <td className="p-2 border text-xs">{c.parentCategoryId || "-"}</td>
+                <td className="p-2 border text-xs">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditing(c)}
+                      className="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 text-xs"
+                    >Edit</button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`Delete category "${c.name}"?`)) return;
+                        try {
+                          await deleteCategory(c.id);
+                          setCategories(prev => prev.filter(p => p.id !== c.id));
+                          if (editing?.id === c.id) setEditing(null);
+                        } catch (err: any) {
+                          alert(err.message || 'Delete failed');
+                        }
+                      }}
+                      className="px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs"
+                    >Delete</button>
+                  </div>
+                </td>
               </tr>
             ))}
             {!loading && categories.length === 0 && (
