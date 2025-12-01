@@ -133,37 +133,13 @@ function ChartTooltipContent({
   }) {
   const { config } = useChart();
 
-  const tooltipLabel = React.useMemo(() => {
-    if (hideLabel || !payload?.length) {
-      return null;
-    }
-
-    const [item] = payload;
-    const key = `${labelKey || item?.dataKey || item?.name || "value"}`;
-    // Prefer the provided label (e.g., time like "06:00") instead of config label
-    const value = typeof label === "string" ? label : undefined;
-
-    if (labelFormatter) {
-      return (
-        <div className={cn("font-medium", labelClassName)}>
-          {labelFormatter(value, payload)}
-        </div>
-      );
-    }
-
-    if (!value) {
-      return null;
-    }
-
-    return <div className={cn("font-medium", labelClassName)}>{value}</div>;
-  }, [
-    label,
-    labelFormatter,
-    payload,
-    hideLabel,
-    labelClassName,
-    labelKey,
-  ]);
+  // Derive header time directly from payload to avoid accidental series labels
+  const tooltipTime = React.useMemo(() => {
+    if (!payload?.length) return null;
+    const p0 = payload[0] as any;
+    const t = p0?.payload?.time as string | undefined;
+    return t || null;
+  }, [payload]);
 
   if (!active || !payload?.length) {
     return null;
@@ -174,13 +150,13 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        // White tooltip background per request, with subtle animation
-        "bg-white text-foreground animate-in fade-in-0 zoom-in-95 z-50 w-fit rounded-md px-3 py-1.5 text-xs shadow-xl",
+        // White tooltip background with amber border for clarity
+        "bg-white text-foreground animate-in fade-in-0 zoom-in-95 z-50 w-fit rounded-md px-3 py-1.5 text-xs shadow-xl border border-amber-200",
         className,
       )}
     >
-      {!nestLabel ? (
-        <div className="mb-1.5">{tooltipLabel}</div>
+      {tooltipTime ? (
+        <div className="mb-1.5 font-medium text-muted-foreground">{tooltipTime}</div>
       ) : null}
       <div className="grid gap-2">
         {payload.map((item, index) => {
@@ -228,15 +204,10 @@ function ChartTooltipContent({
                       nestLabel ? "items-end" : "items-center",
                     )}
                   >
-                    <div className="grid gap-1.5">
-                      {nestLabel ? tooltipLabel : null}
-                      <span className="text-muted-foreground">
-                        {itemConfig?.label || item.name}
-                      </span>
-                    </div>
+                    <div className="grid gap-1.5" />
                     {item.value && (
                       <span className="text-foreground font-mono font-medium tabular-nums">
-                        {`Price: ${Number(item.value).toFixed(2)} ${unit || ""}`.trim()}
+                        {`Price : ${unit || ""} ${Number(item.value).toFixed(2)}`.trim()}
                       </span>
                     )}
                   </div>

@@ -103,6 +103,7 @@ export function HeroSection({
                   content={
                     <ChartTooltipContent
                       unit="AED"
+                      hideLabel
                       labelFormatter={(label) => (
                         <span className="text-muted-foreground">{label}</span>
                       )}

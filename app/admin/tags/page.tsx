@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import React from "react";
 import { getTags } from "../../../lib/api";
 import { TagForm } from "../../../components/admin/TagForm";

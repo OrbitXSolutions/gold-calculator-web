@@ -109,7 +109,7 @@ export default function AdminCommentsPage() {
             {comments.map(c => (
               <tr key={c.id} className="border-t">
                 <td className="p-2 border font-medium w-32">{c.authorDisplayName}</td>
-                <td className="p-2 border text-xs w-40 truncate" title={c.authorEmail}>{c.authorEmail || ""}</td>
+                <td className="p-2 border text-xs w-40 truncate" title={String((c as any)?.authorEmail || "")}>{String((c as any)?.authorEmail || "")}</td>
                 <td className="p-2 border whitespace-pre-line align-top max-w-md">
                   {editingId === c.id ? (
                     <textarea value={editContent} onChange={e => setEditContent(e.target.value)} className="w-full rounded border px-2 py-1 text-xs h-32" />
