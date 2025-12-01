@@ -3,6 +3,19 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
+import { defaultSchema } from "hast-util-sanitize";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Heading from "@tiptap/extension-heading";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
+import BulletList from "@tiptap/extension-bullet-list";
+import OrderedList from "@tiptap/extension-ordered-list";
+import ListItem from "@tiptap/extension-list-item";
+import CodeBlock from "@tiptap/extension-code-block";
+import TextAlign from "@tiptap/extension-text-align";
+import { Markdown } from "tiptap-markdown";
+import { uploadMedia } from "../../lib/api";
 
 interface RichMarkdownEditorProps {
   value: string;
@@ -21,19 +34,34 @@ function insertSyntax(current: string, syntax: string, cursorPos: number): { nex
 export function RichMarkdownEditor({ value, onChange, height = 400 }: RichMarkdownEditorProps) {
   const [preview, setPreview] = React.useState(false);
   const [dir, setDir] = React.useState<"ltr" | "rtl">("rtl");
-  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Heading.configure({ levels: [1,2,3] }),
+      Link.configure({ autolink: true, openOnClick: true, linkOnPaste: true }),
+      Image,
+      BulletList,
+      OrderedList,
+      ListItem,
+      CodeBlock,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      Markdown.configure({ html: false, transformPastedText: true }),
+    ],
+    content: value || "",
+    immediatelyRender: false,
+    onUpdate({ editor }) {
+      const md = editor.storage.markdown.getMarkdown();
+      onChange(md);
+    },
+  });
+
+  function cmd(fn: () => void) { fn(); }
   function apply(syntax: string) {
-    const el = textareaRef.current;
-    if (!el) return;
-    const pos = el.selectionStart ?? value.length;
-    const { next, nextCursor } = insertSyntax(value, syntax, pos);
-    onChange(next);
-    requestAnimationFrame(() => {
-      el.focus();
-      el.selectionStart = el.selectionEnd = nextCursor;
-    });
+    // Fallback insertion if editor not ready
+    if (!editor) return;
+    editor.commands.insertContent(syntax);
   }
 
   const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
@@ -60,13 +88,15 @@ export function RichMarkdownEditor({ value, onChange, height = 400 }: RichMarkdo
     const file = e.target.files?.[0];
     e.target.value = ""; // reset
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const url = String(reader.result || "");
-      if (!url) return;
-      apply(`![${file.name}](${url})`);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const media = await uploadMedia(file);
+      if (media?.url) {
+        apply(`![${media.fileName || file.name}](${media.url})`);
+      }
+    } catch (err: any) {
+      console.error("Image upload failed", err);
+      alert(err?.message || "Image upload failed");
+    }
   }
 
   return (
@@ -74,19 +104,19 @@ export function RichMarkdownEditor({ value, onChange, height = 400 }: RichMarkdo
       <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-b bg-gray-50">
         <span className="text-xs font-semibold text-gray-600">Markdown Editor</span>
         <div className="flex flex-wrap gap-1">
-          <button type="button" onClick={() => apply("**bold**")} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">B</button>
-          <button type="button" onClick={() => apply("*italic*") } className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100 italic">i</button>
-          <button type="button" onClick={() => apply("`code`") } className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100 font-mono">{'</>'}</button>
+          <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">B</button>
+          <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100 italic">i</button>
+          <button type="button" onClick={() => editor?.chain().focus().toggleCode().run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100 font-mono">{'</>'}</button>
           <button type="button" onClick={() => apply("\n\n> quote\n\n") } className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">"</button>
-          <button type="button" onClick={() => apply("\n\n``````\n\n") } className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">CodeBlk</button>
-          <button type="button" onClick={actions.h1} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">H1</button>
-          <button type="button" onClick={actions.h2} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">H2</button>
-          <button type="button" onClick={actions.h3} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">H3</button>
+          <button type="button" onClick={() => apply("\n\n```\n\n```\n\n") } className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">CodeBlk</button>
+          <button type="button" onClick={() => editor?.chain().focus().setHeading({ level: 1 }).run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">H1</button>
+          <button type="button" onClick={() => editor?.chain().focus().setHeading({ level: 2 }).run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">H2</button>
+          <button type="button" onClick={() => editor?.chain().focus().setHeading({ level: 3 }).run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">H3</button>
           <button type="button" onClick={() => apply("[text](url)") } className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">Link</button>
           <button type="button" onClick={actions.img} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">Image</button>
-          <button type="button" onClick={actions.ul} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">• List</button>
-          <button type="button" onClick={actions.ol} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">1. List</button>
-          <button type="button" onClick={actions.table} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">Table</button>
+          <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">• List</button>
+          <button type="button" onClick={() => editor?.chain().focus().toggleOrderedList().run()} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">1. List</button>
+          <button type="button" onClick={() => apply("\n\n| Column A | Column B |\n|---|---|\n| Val 1 | Val 2 |\n\n")} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">Table</button>
           <button type="button" onClick={actions.hr} className="px-2 py-1 text-xs rounded bg-white border hover:bg-gray-100">HR</button>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -102,18 +132,31 @@ export function RichMarkdownEditor({ value, onChange, height = 400 }: RichMarkdo
       </div>
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onPickFile} />
       {!preview ? (
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          style={{ minHeight: height }}
-          className="w-full p-3 text-sm font-mono outline-none resize-y"
-          dir={dir}
-          placeholder="Write your blog content using GitHub Flavored Markdown..."
-        />
+        <div className="p-2" dir={dir}>
+          <EditorContent editor={editor} className="tiptap-content border rounded min-h-[300px]" />
+        </div>
       ) : (
         <div className="prose max-w-none p-3 overflow-y-auto" style={{ maxHeight: height }} dir={dir}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>{value || "_Nothing to preview yet..._"}</ReactMarkdown>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[
+              [rehypeSanitize, {
+                ...defaultSchema,
+                attributes: {
+                  ...defaultSchema.attributes,
+                  img: ['src', 'alt', 'title'],
+                  a: ['href', 'title', 'target', 'rel'],
+                },
+                protocols: {
+                  ...((defaultSchema as any).protocols || {}),
+                  src: ['http', 'https', 'data'],
+                  href: ['http', 'https', 'mailto'],
+                },
+              }]
+            ]}
+          >
+            {value || "_Nothing to preview yet..._"}
+          </ReactMarkdown>
         </div>
       )}
       <div className="px-3 py-2 text-[11px] text-gray-500 border-t flex justify-between">

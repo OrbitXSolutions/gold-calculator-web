@@ -260,6 +260,41 @@ export async function deleteTag(id: string): Promise<void> {
   await handleResponse<void>(res);
 }
 
+// --- Media ---
+export interface MediaDto {
+  id: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+  url: string;
+  uploadedUtc?: string;
+}
+
+// Upload a single file (multipart/form-data)
+export async function uploadMedia(file: File): Promise<MediaDto> {
+  const url = buildUrl("Media"); // Swagger shows /api/Media
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { ...authHeaders() },
+    body: form,
+  });
+  return handleResponse<MediaDto>(res);
+}
+
+export async function getMedia(id: string): Promise<MediaDto> {
+  const url = buildUrl(`Media/${id}`);
+  const res = await fetch(url, { headers: { ...authHeaders() }, next: { revalidate: 300 } });
+  return handleResponse<MediaDto>(res);
+}
+
+export async function deleteMedia(id: string): Promise<void> {
+  const url = buildUrl(`Media/${id}`);
+  const res = await fetch(url, { method: "DELETE", headers: { ...authHeaders() } });
+  await handleResponse<void>(res);
+}
+
 // --- Optional advanced endpoint ---
 export async function regenerateSlug(id: string, strategy: "fromTitle" = "fromTitle"): Promise<BlogDto> {
   const url = buildUrl(`blogs/${id}/regenerate-slug`);

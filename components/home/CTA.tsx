@@ -1,6 +1,7 @@
 "use client"
 import { motion } from 'framer-motion'
 const MotionDiv: any = motion.div
+import Link from 'next/link'
 
 export default function CTA() {
   return (
@@ -12,7 +13,7 @@ export default function CTA() {
             Use the calculator below to check your gold deal within seconds.
           </p>
           <div className="mt-6">
-            <button className="gold-btn">Go to Calculator</button>
+            <Link href="/calculator" className="gold-btn">Go to Calculator</Link>
           </div>
         </MotionDiv>
       </div>
