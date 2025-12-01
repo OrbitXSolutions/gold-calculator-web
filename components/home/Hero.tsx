@@ -1,5 +1,6 @@
 "use client"
 import { CheckCircle } from 'lucide-react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 const MotionDiv: any = motion.div
 const MotionH1: any = motion.h1
@@ -39,7 +40,7 @@ export default function Hero() {
         </MotionDiv>
 
         <MotionDiv initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }} className="mt-8 flex justify-center">
-          <button className="gold-btn">Go to Calculator</button>
+          <Link href="/calculator" className="gold-btn">Go to Calculator</Link>
         </MotionDiv>
       </div>
     </section>
